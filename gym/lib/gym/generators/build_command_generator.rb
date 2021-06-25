@@ -7,6 +7,7 @@ module Gym
     class << self
       def generate
         parts = prefix
+        parts += arch
         parts << Gym.config[:xcodebuild_command]
         parts += options
         parts += buildactions
@@ -27,6 +28,20 @@ module Gym
         proj = Gym.project.xcodebuild_parameters
         return proj if proj.count > 0
         UI.user_error!("No project/workspace found")
+      end
+
+      def arch
+        config = Gym.config
+
+        arch_options = []
+        # optional to satisfy running xcodebuild under a different architecture
+        # than the one that fastlane is using (ex: -x86_64 vs -arm64)
+        if config[:arch_options]
+          arch_options << "arch"
+          arch_options << config[:arch_options]
+        end
+
+        arch_options
       end
 
       def options
